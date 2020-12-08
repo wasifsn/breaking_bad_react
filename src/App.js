@@ -1,25 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState, useEffect } from "react";
+import "./App.css";
+import axios from "axios";
+import Header from "./components/ui/Header";
+import Search from "./components/ui/Search";
+import CharacterGrid from "./components/characters/CharacterGrid";
 
-function App() {
+const App = () => {
+  const [text, setText] = useState("");
+  const [items, setItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const handleChange = (e) => {
+    console.log(text);
+    setText(e.target.value);
+  };
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const result = await axios.get(
+          `https://www.breakingbadapi.com/api/characters`
+        );
+        setItems(result.data);
+        setIsLoading(false);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchItems();
+  }, []);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container">
+      <Header />
+      <Search text={text} onChange={(e) => handleChange(e)} />
+      <CharacterGrid isLoading={isLoading} items={items} text={text} />
     </div>
   );
-}
+};
 
 export default App;
